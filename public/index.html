@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FleetTrack — Vehicle Telemetry Dashboard</title>
+  <meta name="description"
+    content="Real-time vehicle telemetry monitoring dashboard. Track speed, temperature, battery, and GPS location for your entire fleet." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="#2563EB" />
+          <path d="M6 20l4-8 4 4 4-10 4 6 4-4" stroke="white" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        <span class="logo-text">FleetTrack</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><span></span><span></span><span></span></button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#dashboard" class="nav-item active" id="nav-dashboard" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#vehicles" class="nav-item" id="nav-vehicles" data-page="vehicles">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2M9 21a2 2 0 100-4 2 2 0 000 4zm11 0a2 2 0 100-4 2 2 0 000 4z" />
+        </svg>
+        <span>Vehicles</span>
+        <span class="nav-badge" id="vehicleCountBadge">0</span>
+      </a>
+      <a href="#alerts" class="nav-item" id="nav-alerts" data-page="alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+        </svg>
+        <span>Alerts</span>
+        <span class="nav-badge nav-badge--alert" id="alertCountBadge" style="display:none">0</span>
+      </a>
+      <a href="#map" class="nav-item" id="nav-map" data-page="map">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+          <line x1="9" y1="3" x2="9" y2="18" />
+          <line x1="15" y1="6" x2="15" y2="21" />
+        </svg>
+        <span>Live Map</span>
+      </a>
+      <a href="#analytics" class="nav-item" id="nav-analytics" data-page="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+        <span>Analytics</span>
+      </a>
+      <a href="#maintenance" class="nav-item" id="nav-maintenance" data-page="maintenance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
+        </svg>
+        <span>Maintenance</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">FT</div>
+        <div class="user-info">
+          <span class="user-name">Fleet Admin</span>
+          <span class="user-role">System Monitor</span>
+        </div>
+        <div class="live-dot" title="Live"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content" id="mainContent">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+        <span class="breadcrumb">Fleet Monitor</span>
+      </div>
+      <div class="topbar-right">
+        <div class="live-indicator"><span class="pulse-dot"></span><span>Live</span></div>
+        <span class="topbar-time" id="topbarTime"></span>
+        <button class="btn-primary" id="addVehicleBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Vehicle
+        </button>
+      </div>
+    </header>
+
+    <!-- ── DASHBOARD PAGE ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--total">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Total Fleet</span>
+            <span class="stat-value" id="statTotal">—</span>
+            <span class="stat-sub">Registered vehicles</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Active Now</span>
+            <span class="stat-value" id="statActive">—</span>
+            <span class="stat-sub">Transmitting data</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--warning">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Warnings</span>
+            <span class="stat-value" id="statWarning">—</span>
+            <span class="stat-sub">Needs attention</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--critical">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Critical</span>
+            <span class="stat-value" id="statCritical">—</span>
+            <span class="stat-sub">Immediate action</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fleet Statistics Row -->
+      <div class="fleet-stats-row" id="fleetStatsRow">
+        <div class="fstat-card">
+          <div class="fstat-icon">⚡</div>
+          <div class="fstat-info">
+            <span class="fstat-label">Avg Speed</span>
+            <span class="fstat-value" id="fsAvgSpeed">—</span>
+            <span class="fstat-unit">km/h</span>
+          </div>
+        </div>
+        <div class="fstat-card">
+          <div class="fstat-icon">🛣️</div>
+          <div class="fstat-info">
+            <span class="fstat-label">Total Distance</span>
+            <span class="fstat-value" id="fsTotalDist">—</span>
+            <span class="fstat-unit">km</span>
+          </div>
+        </div>
+        <div class="fstat-card">
+          <div class="fstat-icon">🔋</div>
+          <div class="fstat-info">
+            <span class="fstat-label">Avg Battery</span>
+            <span class="fstat-value" id="fsAvgBattery">—</span>
+            <span class="fstat-unit">%</span>
+          </div>
+        </div>
+        <div class="fstat-card">
+          <div class="fstat-icon">✅</div>
+          <div class="fstat-info">
+            <span class="fstat-label">Active Vehicles</span>
+            <span class="fstat-value" id="fsActivePercent">—</span>
+            <span class="fstat-unit">%</span>
+          </div>
+        </div>
+        <div class="fstat-card">
+          <div class="fstat-icon">❤️</div>
+          <div class="fstat-info">
+            <span class="fstat-label">Avg Health</span>
+            <span class="fstat-value" id="fsAvgHealth">—</span>
+            <span class="fstat-unit">/ 100</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Leaderboard -->
+        <div class="card leaderboard-card">
+          <div class="card-header">
+            <h2 class="card-title">Fleet Leaderboard</h2>
+            <span class="card-subtitle">By Efficiency</span>
+          </div>
+          <div class="leaderboard-list" id="dashboardLeaderboard">
+            <div class="skeleton-list">
+              <div class="skeleton-row" style="height:48px"></div>
+              <div class="skeleton-row" style="height:48px"></div>
+              <div class="skeleton-row" style="height:48px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card fleet-overview-card">
+          <div class="card-header">
+            <h2 class="card-title">Fleet Overview</h2>
+            <a href="#vehicles" class="card-link" id="viewAllVehiclesLink">View All →</a>
+          </div>
+          <div class="fleet-list" id="dashboardFleetList">
+            <div class="skeleton-list">
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-header">
+            <h2 class="card-title">Fleet Speed Trend</h2><span class="card-subtitle" id="speedChartLabel">Last 30
+              readings</span>
+          </div>
+          <div class="chart-container"><canvas id="dashSpeedChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VEHICLES PAGE ── -->
+    <div class="page" id="page-vehicles">
+      <div class="vehicles-toolbar">
+        <input type="text" class="search-input" id="vehicleSearch" placeholder="Search vehicles…" />
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="Normal">Normal</button>
+          <button class="filter-btn" data-filter="Warning">Warning</button>
+          <button class="filter-btn" data-filter="Critical">Critical</button>
+        </div>
+      </div>
+      <div class="vehicles-grid" id="vehiclesGrid"></div>
+    </div>
+
+    <!-- ── ALERTS PAGE ── -->
+    <div class="page" id="page-alerts">
+      <div class="alerts-toolbar">
+        <span class="alerts-count-label" id="alertsCountLabel">Loading…</span>
+        <button class="btn-secondary" id="dismissAllBtn">Dismiss All</button>
+      </div>
+      <div class="alerts-list" id="alertsList">
+        <div class="skeleton-list">
+          <div class="skeleton-row"></div>
+          <div class="skeleton-row"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAP PAGE ── -->
+    <div class="page" id="page-map">
+      <div class="map-toolbar">
+        <div class="replay-controls">
+          <span class="replay-label">Telemetry Replay:</span>
+          <select id="replayVehicleSelect" class="replay-select">
+            <option value="">Live Fleet View</option>
+          </select>
+          <div class="replay-slider-wrap" id="replaySliderWrap" style="display:none">
+            <input type="range" id="replaySlider" min="0" max="100" value="100" class="replay-slider">
+            <span id="replayTimeDisplay" class="replay-time-display">Live</span>
+          </div>
+        </div>
+      </div>
+      <div class="map-wrapper" id="mapWrapper">
+        <div id="leafletMap"></div>
+        <div class="map-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:var(--blue-500)"></span>Authorized Zone
+          </div>
+          <div class="legend-item"><span class="legend-dot" style="background:var(--red-500)"></span>Restricted Zone
+          </div>
+          <div style="height:1px;background:var(--gray-200);margin:4px 0"></div>
+          <div class="legend-item"><span class="legend-dot legend-dot--normal"></span>Normal</div>
+          <div class="legend-item"><span class="legend-dot legend-dot--warning"></span>Warning</div>
+          <div class="legend-item"><span class="legend-dot legend-dot--critical"></span>Critical</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS PAGE ── -->
+    <div class="page" id="page-analytics">
+      <div class="analytics-select-wrap">
+        <label for="analyticsVehicleSelect">Vehicle:</label>
+        <select id="analyticsVehicleSelect" class="analytics-select"></select>
+      </div>
+      <div class="analytics-grid">
+        <div class="card chart-card chart-card--tall">
+          <div class="card-header">
+            <h2 class="card-title">Speed Over Time</h2><span class="card-subtitle">km/h</span>
+          </div>
+          <div class="chart-container chart-container--tall"><canvas id="analyticsSpeedChart"></canvas></div>
+        </div>
+        <div class="card chart-card chart-card--tall">
+          <div class="card-header">
+            <h2 class="card-title">Temperature Over Time</h2><span class="card-subtitle">°C</span>
+          </div>
+          <div class="chart-container chart-container--tall"><canvas id="analyticsTempChart"></canvas></div>
+        </div>
+        <div class="card chart-card chart-card--tall">
+          <div class="card-header">
+            <h2 class="card-title">Battery Level Trend</h2><span class="card-subtitle">%</span>
+          </div>
+          <div class="chart-container chart-container--tall"><canvas id="analyticsBatteryChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAINTENANCE PAGE ── -->
+    <div class="page" id="page-maintenance">
+      <div class="maintenance-header-row">
+        <h2 class="section-title">Maintenance Logs</h2>
+      </div>
+      <div class="maintenance-grid" id="maintenanceGrid"></div>
+    </div>
+
+    <!-- ── VEHICLE DETAIL PAGE ── -->
+    <div class="page" id="page-vehicledetail">
+      <div class="detail-page-header" id="detailPageHeader">
+        <button class="btn-back" id="detailBackBtn">← Back</button>
+        <div>
+          <h2 class="detail-page-title" id="detailPageTitle">Vehicle Detail</h2>
+          <span class="detail-page-sub" id="detailPageSub"></span>
+        </div>
+        <div class="detail-page-scores" id="detailPageScores"></div>
+      </div>
+
+      <div class="detail-top-row">
+        <div class="detail-metrics-col" id="detailLiveMetrics"></div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Digital Twin Vehicles -->
+          <div class="glass-panel" style="margin-bottom:20px; text-align:center;">
+            <h3 style="margin:0 0 15px; font-weight:600; font-size:15px; text-align:left;">Digital Twin Live Sync</h3>
+            <div class="digital-twin-container" id="digitalTwinContainer">
+              <div class="dt-car" id="dtCar">
+                <div class="dt-body" id="dtBody"></div>
+                <div class="dt-wheel dt-wheel-fl" id="dtWheelFL"></div>
+                <div class="dt-wheel dt-wheel-fr" id="dtWheelFR"></div>
+                <div class="dt-wheel dt-wheel-rl" id="dtWheelRL"></div>
+                <div class="dt-wheel dt-wheel-rr" id="dtWheelRR"></div>
+                <div class="dt-engine-glow" id="dtEngineGlow"></div>
+              </div>
+              <div class="dt-status-overlay">
+                <div class="dt-status-item">Engine: <span id="dtEngineStatus">ON</span></div>
+                <div class="dt-status-item">Battery: <span id="dtBatteryHealth">GOOD</span></div>
+                <div class="dt-status-item" id="dtSyncPill"
+                  style="display:none; color:var(--warning); border-color:var(--warning);">OFFLINE SYNC PENDING</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card detail-driving-card" id="detailDrivingCard"></div>
+
+          <!-- Predictive Maintenance -->
+          <div class="card predictive-card" style="flex:1">
+            <div class="card-header" style="margin-bottom:12px">
+              <h2 class="card-title">Predictive Maintenance</h2>
+              <span class="card-subtitle">AI Analysis</span>
+            </div>
+            <div class="predictive-list" id="detailPredictiveList">
+              <!-- JS will populate -->
+              <p style="color:var(--gray-400);font-size:13px;text-align:center;padding:20px 0">Analyzing telemetry
+                patterns...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-grid" style="margin-top:16px">
+        <div class="card chart-card chart-card--tall">
+          <div class="card-header">
+            <h2 class="card-title">Speed Over Time</h2><span class="card-subtitle">km/h</span>
+          </div>
+          <div class="chart-container chart-container--tall"><canvas id="detailSpeedChart"></canvas></div>
+        </div>
+        <div class="card chart-card chart-card--tall">
+          <div class="card-header">
+            <h2 class="card-title">Temperature Over Time</h2><span class="card-subtitle">°C</span>
+          </div>
+          <div class="chart-container chart-container--tall"><canvas id="detailTempChart"></canvas></div>
+        </div>
+        <div class="card chart-card chart-card--tall">
+          <div class="card-header">
+            <h2 class="card-title">Battery Level Trend</h2><span class="card-subtitle">%</span>
+          </div>
+          <div class="chart-container chart-container--tall"><canvas id="detailBatteryChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <h2 class="card-title">Telemetry History</h2>
+          <span class="card-subtitle" id="detailHistCount"></span>
+        </div>
+        <div class="telemetry-table-wrap">
+          <table class="telemetry-table" id="telemetryTable">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Speed</th>
+                <th>Temp</th>
+                <th>Battery</th>
+                <th>Fuel</th>
+                <th>Health</th>
+                <th>Driving</th>
+                <th>GPS</th>
+              </tr>
+            </thead>
+            <tbody id="telemetryTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Add Vehicle Modal ── -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="addVehicleModal" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h2 id="modalTitle">Register Vehicle</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      </div>
+      <form class="modal-form" id="vehicleForm">
+        <div class="form-group">
+          <label for="vehicleModel">Vehicle Model</label>
+          <input type="text" id="vehicleModel" placeholder="e.g. Toyota HiLux" required />
+        </div>
+        <div class="form-group">
+          <label for="vehicleType">Vehicle Type</label>
+          <select id="vehicleType" required>
+            <option value="">Select type…</option>
+            <option value="Electric">Electric</option>
+            <option value="Sedan">Sedan</option>
+            <option value="SUV">SUV</option>
+            <option value="Van">Van</option>
+            <option value="Truck">Truck</option>
+            <option value="Motorcycle">Motorcycle</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="vehiclePlate">License Plate</label>
+          <input type="text" id="vehiclePlate" placeholder="e.g. TN-01-AB-1234" required />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="modalCancelBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Register Vehicle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+
+</html>

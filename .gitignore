@@ -1,0 +1,4 @@
+node_modules/
+telemetry.db
+telemetry.db-journal
+.env
