@@ -1,4 +1,4 @@
-# 🚗 AutoIntel – Intelligent Fleet Governance & Telemetry Platform
+#  AutoIntel – Intelligent Fleet Governance & Telemetry Platform
 
 A modern **AI-powered fleet governance system** designed to monitor, analyze, and optimize vehicle operations in real time.
 
@@ -8,7 +8,7 @@ Built with a **modern dashboard UI, real-time telemetry simulation, and data vis
 
 ---
 
-# 🌍 Problem Statement
+#  Problem Statement
 
 Managing fleets across multiple vehicles and organizations is difficult because:
 
@@ -22,11 +22,11 @@ AutoIntel solves this by providing a **centralized intelligent platform for flee
 
 ---
 
-# ✨ Key Features
+#  Key Features
 
-## 🚀 Basic Features (MVP)
+##  Basic Features (MVP)
 
-### 🚗 Vehicle Management
+###  Vehicle Management
 
 * Register vehicles
 * View vehicle list
@@ -43,7 +43,7 @@ AutoIntel solves this by providing a **centralized intelligent platform for flee
 
 ---
 
-### 📡 Telemetry Data Simulation
+###  Telemetry Data Simulation
 
 Simulated real-time telemetry data including:
 
@@ -57,7 +57,7 @@ Telemetry is generated using a **Python-based simulator** and streamed to the da
 
 ---
 
-### 📊 Real-Time Fleet Dashboard
+###  Real-Time Fleet Dashboard
 
 Dashboard overview displaying:
 
@@ -70,7 +70,7 @@ Includes **dynamic vehicle cards and live updates.**
 
 ---
 
-### 🚘 Vehicle Cards
+###  Vehicle Cards
 
 Each vehicle card shows:
 
@@ -83,7 +83,7 @@ This provides **instant visibility of fleet status.**
 
 ---
 
-### 📈 Data Visualization
+###  Data Visualization
 
 Interactive charts display telemetry trends:
 
@@ -98,7 +98,7 @@ Libraries used:
 
 ---
 
-### 🗺️ Live Vehicle Map Tracking
+###  Live Vehicle Map Tracking
 
 Map view showing vehicle locations.
 
@@ -115,13 +115,13 @@ Technologies:
 
 ---
 
-# ⚙️ Intermediate Features
+#  Intermediate Features
 
 These features introduce **data intelligence and analytics.**
 
 ---
 
-## 🧠 Vehicle Health Score
+##  Vehicle Health Score
 
 Each vehicle receives a **health score based on telemetry analysis.**
 
@@ -144,7 +144,7 @@ Status: Good
 
 ---
 
-## ⚠️ Intelligent Alert System
+##  Intelligent Alert System
 
 The system automatically triggers alerts when abnormal conditions occur.
 
@@ -165,7 +165,7 @@ Temperature: 98°C
 
 ---
 
-## 🧑‍✈️ Driving Behaviour Score
+##  Driving Behaviour Score
 
 Evaluates driver behavior using telemetry patterns.
 
@@ -184,7 +184,7 @@ Status: Safe Driving
 
 ---
 
-## 📊 Fleet Statistics
+##  Fleet Statistics
 
 Fleet-wide analytics including:
 
@@ -195,7 +195,7 @@ Fleet-wide analytics including:
 
 ---
 
-## 🔎 Vehicle Detail Page
+##  Vehicle Detail Page
 
 Each vehicle has a dedicated analytics page showing:
 
@@ -206,7 +206,7 @@ Each vehicle has a dedicated analytics page showing:
 
 ---
 
-## 🛠 Maintenance Logs
+##  Maintenance Logs
 
 Track vehicle maintenance history.
 
@@ -220,13 +220,13 @@ Next Service: 15 Apr
 
 ---
 
-# 🧠 Advanced Features
+#  Advanced Features
 
 These features simulate a **production-grade intelligent fleet platform.**
 
 ---
 
-## 📈 Fleet Efficiency Score
+##  Fleet Efficiency Score
 
 Measures overall fleet performance.
 
@@ -245,7 +245,7 @@ Fleet Efficiency: 91%
 
 ---
 
-## ⏪ Telemetry Replay Timeline
+##  Telemetry Replay Timeline
 
 Allows users to **replay historical vehicle movement.**
 
@@ -260,7 +260,7 @@ Vehicle path replays on the map.
 
 ---
 
-## 📍 Geofencing
+##  Geofencing
 
 Define authorized zones.
 
@@ -277,7 +277,7 @@ Alert when vehicles leave defined zones.
 
 ---
 
-## ⏳ Idle Vehicle Detection
+##  Idle Vehicle Detection
 
 Detects vehicles that are:
 
@@ -293,7 +293,7 @@ Vehicle idle for 12 minutes
 
 ---
 
-## 🔮 Predictive Maintenance
+##  Predictive Maintenance
 
 Uses telemetry patterns to **predict potential failures.**
 
@@ -312,7 +312,7 @@ Suggested Service in 3 days
 
 ---
 
-## 🏆 Fleet Performance Leaderboard
+##  Fleet Performance Leaderboard
 
 Ranks vehicles based on performance metrics.
 
@@ -328,7 +328,7 @@ Efficiency: 91%
 
 ---
 
-# 🏗 System Architecture
+#  System Architecture
 
 AutoIntel uses a **modern IoT telemetry architecture**:
 
@@ -346,7 +346,7 @@ Real-Time Dashboard
 
 ---
 
-# 🧰 Tech Stack
+#  Tech Stack
 
 ### Frontend
 
@@ -370,7 +370,7 @@ Real-Time Dashboard
 
 ---
 
-# 📂 Project Structure
+#  Project Structure
 
 ```
 AutoIntel
@@ -394,7 +394,7 @@ AutoIntel
 
 ---
 
-# 🚀 Future Improvements
+#  Future Improvements
 
 * AI anomaly detection
 * Reinforcement learning fleet optimization
@@ -404,7 +404,7 @@ AutoIntel
 
 ---
 
-# 🏆 Hackathon Impact
+#  Hackathon Impact
 
 AutoIntel demonstrates how **AI + IoT + Real-time analytics** can transform fleet operations by:
 
@@ -415,16 +415,7 @@ AutoIntel demonstrates how **AI + IoT + Real-time analytics** can transform flee
 
 ---
 
-# 👨‍💻 Team
+#  Team
 
 Developed during a **24-hour Hackathon** focused on **Fleet Governance & Scheduling Systems.**
 
----
-
-If you want, I can also give you **3 things that make judges instantly impressed on GitHub:**
-
-* ⭐ **Elite README design (with badges, GIF demo, architecture diagram)**
-* 🧠 **Architecture diagram (Mermaid)**
-* 🎬 **Demo video script judges love**
-
-Just say **“make my README hackathon-winning”** and I’ll upgrade it.
